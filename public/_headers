@@ -1,0 +1,16 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/assets/*.js
+  Content-Type: text/javascript
+
+/assets/*.mjs
+  Content-Type: text/javascript
+
+*.js
+  Content-Type: text/javascript
+
+*.mjs
+  Content-Type: text/javascript 
