@@ -229,7 +229,14 @@ const MyBookings = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div className="flex items-center text-sm text-gray-600">
                             <MapPin className="w-4 h-4 mr-2" />
-                            {booking.location || '구글스타트업캠퍼스 서울'}
+                            <a 
+                              href="https://naver.me/xCB7C3ew" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-google-blue hover:text-blue-600 hover:underline cursor-pointer"
+                            >
+                              {booking.location || '구글스타트업캠퍼스 서울'}
+                            </a>
                           </div>
                           <div className="text-sm text-gray-600">
                             <strong>주최자:</strong> {booking.hostName || '장영하'}
@@ -309,7 +316,14 @@ const MyBookings = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex items-center text-sm text-gray-500">
                           <MapPin className="w-4 h-4 mr-2" />
-                          {booking.location || '구글스타트업캠퍼스 서울'}
+                          <a 
+                            href="https://naver.me/xCB7C3ew" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-google-blue hover:text-blue-600 hover:underline cursor-pointer"
+                          >
+                            {booking.location || '구글스타트업캠퍼스 서울'}
+                          </a>
                         </div>
                         <div className="text-sm text-gray-500">
                           <strong>주최자:</strong> {booking.hostName || '장영하'}

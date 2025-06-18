@@ -789,7 +789,17 @@ const AdminDashboard = () => {
                             <p className="text-sm text-gray-600">예약자: {booking.userName || booking.userId}</p>
                             {booking.userPhone && <p className="text-sm text-gray-600">전화번호: {booking.userPhone}</p>}
                             <p className="text-sm text-gray-500">주최자: {booking.hostName || booking.hostId || '미지정'}</p>
-                            <p className="text-sm text-gray-500">장소: {booking.location || '미지정'}</p>
+                            <p className="text-sm text-gray-500">
+                              장소: 
+                              <a 
+                                href="https://naver.me/xCB7C3ew" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-google-blue hover:text-blue-600 hover:underline cursor-pointer ml-1"
+                              >
+                                {booking.location || '구글스타트업캠퍼스 서울'}
+                              </a>
+                            </p>
                             <p className="text-sm text-gray-500">일시: {booking.date ? format(new Date(booking.date), 'yyyy년 M월 d일', { locale: ko }) : '날짜 정보 없음'}</p>
                             {booking.notes && <p className="text-xs text-gray-400 mt-1">메모: {booking.notes}</p>}
                           </div>
