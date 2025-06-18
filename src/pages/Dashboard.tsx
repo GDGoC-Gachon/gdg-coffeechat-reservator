@@ -16,6 +16,8 @@ interface Booking {
   userId: string;
   userName?: string; // 예약자 이름 (옵셔널)
   userPhone?: string; // 예약자 전화번호 (옵셔널)
+  hostName?: string; // 주최자 이름 (옵셔널)
+  location?: string; // 장소 (옵셔널)
   // 필요에 따라 다른 필드 추가 가능 (예: coffeeShop, notes 등)
 }
 

@@ -21,7 +21,7 @@ interface Booking {
   userName?: string;
   userPhone?: string;
   location?: string;
-  interviewer?: string;
+  hostName?: string;
 }
 
 const MyBookings = () => {
@@ -229,10 +229,10 @@ const MyBookings = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div className="flex items-center text-sm text-gray-600">
                             <MapPin className="w-4 h-4 mr-2" />
-                            {booking.location}
+                            {booking.location || '구글스타트업캠퍼스 서울'}
                           </div>
                           <div className="text-sm text-gray-600">
-                            <strong>면접관:</strong> {booking.interviewer}
+                            <strong>주최자:</strong> {booking.hostName || '장영하'}
                           </div>
                         </div>
 
@@ -309,10 +309,10 @@ const MyBookings = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex items-center text-sm text-gray-500">
                           <MapPin className="w-4 h-4 mr-2" />
-                          {booking.location}
+                          {booking.location || '구글스타트업캠퍼스 서울'}
                         </div>
                         <div className="text-sm text-gray-500">
-                          <strong>면접관:</strong> {booking.interviewer}
+                          <strong>주최자:</strong> {booking.hostName || '장영하'}
                         </div>
                       </div>
                     </CardContent>

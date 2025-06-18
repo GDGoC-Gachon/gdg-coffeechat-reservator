@@ -19,6 +19,8 @@ interface BookingDocument {
   userId: string;
   userName: string;
   userPhone?: string;
+  hostName?: string;
+  location?: string;
   date: string;
   time: string;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
@@ -116,6 +118,8 @@ const Booking = () => {
       userId: user.id,
       userName: user.displayName || 'AnonymousUser',
       userPhone: userPhone.trim(),
+      hostName: '장영하',
+      location: '구글스타트업캠퍼스 서울',
       date: format(selectedDate, 'yyyy-MM-dd'),
       time: selectedTime,
       updatedAt: Timestamp.now(),

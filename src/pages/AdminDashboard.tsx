@@ -39,6 +39,7 @@ interface Booking {
   userPhone?: string;
   hostId?: string;
   hostName?: string;
+  location?: string;
   date: string;
   time: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
@@ -55,6 +56,7 @@ interface BookingFormState {
   userPhone?: string;
   hostId?: string;
   hostName?: string;
+  location?: string;
   date?: string;
   time?: string;
   status?: 'pending' | 'confirmed' | 'completed' | 'cancelled';
@@ -159,6 +161,7 @@ const AdminDashboard = () => {
             userPhone: data.userPhone,
             hostId: data.hostId,
             hostName: data.hostName,
+            location: data.location,
             status: data.status,
             notes: data.notes,
             title: data.title,
@@ -422,7 +425,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     setIsSubmittingBooking(true);
 
-    const { userId, userName, userPhone, hostId, hostName, date: formDateStr, time: formTimeStr, status: formStatus, notes, title } = bookingFormData;
+    const { userId, userName, userPhone, hostId, hostName, location, date: formDateStr, time: formTimeStr, status: formStatus, notes, title } = bookingFormData;
 
     if (!userId || !formDateStr || !formTimeStr || !formStatus) {
       toast({ title: "입력 오류", description: "예약자, 예약 날짜, 시간, 상태를 올바르게 입력해주세요.", variant: "destructive" });
@@ -435,7 +438,8 @@ const AdminDashboard = () => {
       userName: userName || users.find(u => u.id === userId)?.displayName || '알 수 없는 사용자',
       userPhone: userPhone || '',
       hostId: hostId || adminUser?.id,
-      hostName: hostName || adminUser?.displayName,
+      hostName: hostName || '장영하',
+      location: location || '구글스타트업캠퍼스 서울',
       status: formStatus,
       notes: notes || '',
       title: title || '커피챗 세션',
@@ -481,6 +485,7 @@ const AdminDashboard = () => {
           userPhone: payloadForAdd.userPhone,
           hostId: payloadForAdd.hostId,
           hostName: payloadForAdd.hostName,
+          location: payloadForAdd.location,
           status: payloadForAdd.status,
           notes: payloadForAdd.notes,
           title: payloadForAdd.title,
@@ -741,8 +746,12 @@ const AdminDashboard = () => {
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="bookingHostName">주최자 이름 (기본: 현재 관리자)</Label>
-                          <Input id="bookingHostName" name="hostName" value={bookingFormData.hostName || ''} onChange={handleBookingFormChange} placeholder="주최자 이름" />
+                          <Label htmlFor="bookingHostName">주최자 이름</Label>
+                          <Input id="bookingHostName" name="hostName" value={bookingFormData.hostName || '장영하'} onChange={handleBookingFormChange} placeholder="장영하" />
+                        </div>
+                        <div>
+                          <Label htmlFor="bookingLocation">장소</Label>
+                          <Input id="bookingLocation" name="location" value={bookingFormData.location || '구글스타트업캠퍼스 서울'} onChange={handleBookingFormChange} placeholder="구글스타트업캠퍼스 서울" />
                         </div>
                         <div>
                           <Label htmlFor="bookingNotes">메모 (선택)</Label>
@@ -780,6 +789,7 @@ const AdminDashboard = () => {
                             <p className="text-sm text-gray-600">예약자: {booking.userName || booking.userId}</p>
                             {booking.userPhone && <p className="text-sm text-gray-600">전화번호: {booking.userPhone}</p>}
                             <p className="text-sm text-gray-500">주최자: {booking.hostName || booking.hostId || '미지정'}</p>
+                            <p className="text-sm text-gray-500">장소: {booking.location || '미지정'}</p>
                             <p className="text-sm text-gray-500">일시: {booking.date ? format(new Date(booking.date), 'yyyy년 M월 d일', { locale: ko }) : '날짜 정보 없음'}</p>
                             {booking.notes && <p className="text-xs text-gray-400 mt-1">메모: {booking.notes}</p>}
                           </div>
