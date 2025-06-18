@@ -4,6 +4,7 @@ import { Navigate, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Calendar } from '@/components/ui/calendar';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ import { db } from '@/lib/firebase';
 interface BookingDocument {
   userId: string;
   userName: string;
+  userPhone?: string;
   date: string;
   time: string;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
@@ -45,6 +47,7 @@ const Booking = () => {
   const [isLoadingInitialData, setIsLoadingInitialData] = useState(!!editingBookingId);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
+  const [userPhone, setUserPhone] = useState<string>('');
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookedSlotsOnSelectedDate, setBookedSlotsOnSelectedDate] = useState<string[]>([]);
@@ -104,10 +107,15 @@ const Booking = () => {
       toast({ title: "입력 오류", description: "날짜와 시간을 모두 선택해주세요.", variant: "destructive" });
       return;
     }
+    if (!userPhone.trim()) {
+      toast({ title: "입력 오류", description: "전화번호를 입력해주세요.", variant: "destructive" });
+      return;
+    }
     setIsSubmitting(true);
     const payload = {
       userId: user.id,
       userName: user.displayName || 'AnonymousUser',
+      userPhone: userPhone.trim(),
       date: format(selectedDate, 'yyyy-MM-dd'),
       time: selectedTime,
       updatedAt: Timestamp.now(),
@@ -130,16 +138,17 @@ const Booking = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [user, selectedDate, selectedTime, editingBookingId, originalBookingData, navigate, toast, setStep, setIsSubmitting]);
+  }, [user, selectedDate, selectedTime, userPhone, editingBookingId, originalBookingData, navigate, toast, setStep, setIsSubmitting]);
 
   const resetBooking = useCallback(() => {
     setSelectedDate(undefined);
     setSelectedTime('');
+    setUserPhone('');
     setBookedSlotsOnSelectedDate([]);
     setStep(1);
     localStorage.removeItem(BOOKING_PROGRESS_STORAGE_KEY); // Clear progress on reset
     if (editingBookingId) navigate('/booking', { replace: true });
-  }, [editingBookingId, navigate, setStep, setSelectedDate, setSelectedTime, setBookedSlotsOnSelectedDate]);
+  }, [editingBookingId, navigate, setStep, setSelectedDate, setSelectedTime, setUserPhone, setBookedSlotsOnSelectedDate]);
 
   const goToDashboard = useCallback(() => {
     navigate('/dashboard');
@@ -172,6 +181,7 @@ const Booking = () => {
             if (isValidDate(dateFromDb)) setSelectedDate(dateFromDb);
             else throw new Error("Invalid date from DB");
             setSelectedTime(bookingData.time);
+            setUserPhone(bookingData.userPhone || '');
           } else {
             toast({ title: "오류", description: "수정할 예약 정보를 찾을 수 없습니다.", variant: "destructive" });
             navigate('/my-bookings');
@@ -283,6 +293,9 @@ const Booking = () => {
           if (savedProgress.time) {
             setSelectedTime(savedProgress.time);
           }
+          if (savedProgress.userPhone) {
+            setUserPhone(savedProgress.userPhone);
+          }
           if (savedProgress.step && typeof savedProgress.step === 'number') {
             // Basic validation for step to avoid breaking UI
             if (savedProgress.step >= 1 && savedProgress.step <= 3) { 
@@ -312,17 +325,18 @@ const Booking = () => {
       const progress = {
         dateStr: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null,
         time: selectedTime,
+        userPhone: userPhone,
         step: step,
       };
       // Only save if there is actually some progress (e.g., date selected or step > 1)
-      if (progress.dateStr || progress.time || progress.step > 1) {
+      if (progress.dateStr || progress.time || progress.userPhone || progress.step > 1) {
         localStorage.setItem(BOOKING_PROGRESS_STORAGE_KEY, JSON.stringify(progress));
       } else {
         // If all are initial/empty, remove any stale storage item
         localStorage.removeItem(BOOKING_PROGRESS_STORAGE_KEY);
       }
     }
-  }, [selectedDate, selectedTime, step, editingBookingId, authLoading]);
+  }, [selectedDate, selectedTime, userPhone, step, editingBookingId, authLoading]);
 
   // Fetch all dates that have any slots configured (once on mount)
   useEffect(() => {
@@ -551,28 +565,47 @@ const Booking = () => {
                     아래 정보로 커피챗을 {editingBookingId ? '수정' : '요청'}합니다.
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col items-center space-y-4 p-3 sm:p-4 pt-1"> 
-                  <div className="space-y-3 p-3 border rounded-lg bg-gray-50 w-full max-w-md text-left">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500">예약자</h3>
-                      <p className="text-lg font-semibold text-gray-800">{user?.displayName || '정보 없음'}</p>
+                <CardContent className="flex flex-col items-center space-y-4 p-3 sm:p-4 pt-1">
+                  <div className="space-y-4 w-full max-w-md">
+                    <div className="space-y-3 p-3 border rounded-lg bg-gray-50 text-left">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">예약자</h3>
+                        <p className="text-lg font-semibold text-gray-800">{user?.displayName || '정보 없음'}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">예약 일시</h3>
+                        <p className="text-lg font-semibold text-gray-800">
+                          {format(selectedDate, 'yyyy년 M월 d일 (eee)', { locale: ko })} {selectedTime}
+                        </p>
+                      </div>
+                      {editingBookingId && originalBookingData?.status && (
+                         <div>
+                           <h3 className="text-sm font-medium text-gray-500">현재 상태</h3>
+                           <p className="text-lg font-semibold">
+                              <Badge className={getStatusBadgeStyle(originalBookingData.status) + " text-base px-2.5 py-1"}>
+                                  {getStatusText(originalBookingData.status)}
+                              </Badge>
+                           </p>
+                         </div>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-500">예약 일시</h3>
-                      <p className="text-lg font-semibold text-gray-800">
-                        {format(selectedDate, 'yyyy년 M월 d일 (eee)', { locale: ko })} {selectedTime}
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="userPhone" className="text-sm font-medium text-gray-700">
+                        전화번호 *
+                      </label>
+                      <Input
+                        id="userPhone"
+                        type="tel"
+                        value={userPhone}
+                        onChange={(e) => setUserPhone(e.target.value)}
+                        placeholder="010-1234-5678"
+                        required
+                      />
+                      <p className="text-xs text-gray-500">
+                        예약 확정 시 문자로 알림을 보내드립니다.
                       </p>
                     </div>
-                    {editingBookingId && originalBookingData?.status && (
-                       <div>
-                         <h3 className="text-sm font-medium text-gray-500">현재 상태</h3>
-                         <p className="text-lg font-semibold">
-                            <Badge className={getStatusBadgeStyle(originalBookingData.status) + " text-base px-2.5 py-1"}>
-                                {getStatusText(originalBookingData.status)}
-                            </Badge>
-                         </p>
-                       </div>
-                    )}
                   </div>
                   <Alert className="border-google-blue/30 bg-google-blue/5 w-full max-w-md mt-2"> 
                     <CalendarIcon className="h-4 w-4 text-google-blue" />
@@ -608,7 +641,7 @@ const Booking = () => {
                     {selectedDate && selectedTime && 
                       `${format(selectedDate, 'PPP (eee)', { locale: ko })} ${selectedTime}에 예약이 요청되었습니다.`}
                     <br />
-                    관리자 확인 후 예약이 확정되며, 확정 시 알림을 보내드립니다.
+                    관리자 확인 후 예약이 확정되며, 확정 시 문자로 알림을 보내드립니다.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col items-center space-y-4 pb-4 px-3 sm:px-4"> 

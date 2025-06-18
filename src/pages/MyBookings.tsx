@@ -19,6 +19,7 @@ interface Booking {
   status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
   userId: string;
   userName?: string;
+  userPhone?: string;
   location?: string;
   interviewer?: string;
 }

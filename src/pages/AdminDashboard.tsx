@@ -36,6 +36,7 @@ interface Booking {
   id: string;
   userId: string; 
   userName: string; 
+  userPhone?: string;
   hostId?: string;
   hostName?: string;
   date: string;
@@ -51,6 +52,7 @@ interface BookingFormState {
   id?: string;
   userId?: string;
   userName?: string;
+  userPhone?: string;
   hostId?: string;
   hostName?: string;
   date?: string;
@@ -383,6 +385,7 @@ const AdminDashboard = () => {
         id: booking.id,
         userId: booking.userId,
         userName: booking.userName,
+        userPhone: booking.userPhone,
         hostId: booking.hostId,
         hostName: booking.hostName,
         status: booking.status,
@@ -418,7 +421,7 @@ const AdminDashboard = () => {
     e.preventDefault();
     setIsSubmittingBooking(true);
 
-    const { userId, userName, hostId, hostName, date: formDateStr, time: formTimeStr, status: formStatus, notes, title } = bookingFormData;
+    const { userId, userName, userPhone, hostId, hostName, date: formDateStr, time: formTimeStr, status: formStatus, notes, title } = bookingFormData;
 
     if (!userId || !formDateStr || !formTimeStr || !formStatus) {
       toast({ title: "입력 오류", description: "예약자, 예약 날짜, 시간, 상태를 올바르게 입력해주세요.", variant: "destructive" });
@@ -429,6 +432,7 @@ const AdminDashboard = () => {
     const dataToSave = {
       userId: userId,
       userName: userName || users.find(u => u.id === userId)?.displayName || '알 수 없는 사용자',
+      userPhone: userPhone || '',
       hostId: hostId || adminUser?.id,
       hostName: hostName || adminUser?.displayName,
       status: formStatus,
@@ -473,6 +477,7 @@ const AdminDashboard = () => {
           id: newDocRef.id,
           userId: payloadForAdd.userId,
           userName: payloadForAdd.userName,
+          userPhone: payloadForAdd.userPhone,
           hostId: payloadForAdd.hostId,
           hostName: payloadForAdd.hostName,
           status: payloadForAdd.status,
@@ -711,6 +716,10 @@ const AdminDashboard = () => {
                           </Select>
                         </div>
                         <div>
+                          <Label htmlFor="bookingUserPhone">예약자 전화번호</Label>
+                          <Input id="bookingUserPhone" name="userPhone" type="tel" value={bookingFormData.userPhone || ''} onChange={handleBookingFormChange} placeholder="010-1234-5678" />
+                        </div>
+                        <div>
                           <Label htmlFor="bookingDate">예약 날짜</Label>
                           <Input id="bookingDate" name="date" type="date" value={bookingFormData.date || ''} onChange={handleBookingFormChange} required />
                         </div>
@@ -768,6 +777,7 @@ const AdminDashboard = () => {
                           <div>
                             <h4 className="font-semibold text-gray-900 text-lg">{booking.title || '커피챗'}</h4>
                             <p className="text-sm text-gray-600">예약자: {booking.userName || booking.userId}</p>
+                            {booking.userPhone && <p className="text-sm text-gray-600">전화번호: {booking.userPhone}</p>}
                             <p className="text-sm text-gray-500">주최자: {booking.hostName || booking.hostId || '미지정'}</p>
                             <p className="text-sm text-gray-500">일시: {booking.date ? format(new Date(booking.date), 'yyyy년 M월 d일', { locale: ko }) : '날짜 정보 없음'}</p>
                             {booking.notes && <p className="text-xs text-gray-400 mt-1">메모: {booking.notes}</p>}
