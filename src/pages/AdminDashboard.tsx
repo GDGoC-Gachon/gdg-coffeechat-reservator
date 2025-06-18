@@ -156,6 +156,7 @@ const AdminDashboard = () => {
             id: doc.id,
             userId: data.userId,
             userName: data.userName,
+            userPhone: data.userPhone,
             hostId: data.hostId,
             hostName: data.hostName,
             status: data.status,
