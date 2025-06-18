@@ -179,17 +179,18 @@ const Dashboard = () => {
           </Card>
 
           {/* Upcoming Bookings */}
-          <Card className="animate-fade-in">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Coffee className="w-5 h-5 mr-2 text-google-green" />
-                다가오는 커피챗
-              </CardTitle>
-              <CardDescription>
-                예정된 커피챗 일정을 확인하세요.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+          <Link to="/my-bookings" className="block">
+            <Card className="animate-fade-in hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Coffee className="w-5 h-5 mr-2 text-google-green" />
+                  다가오는 커피챗
+                </CardTitle>
+                <CardDescription>
+                  예정된 커피챗 일정을 확인하세요.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
               {upcomingBookings.length > 0 ? (
                 <div className="space-y-3">
                   {upcomingBookings.map((booking) => (
@@ -229,6 +230,7 @@ const Dashboard = () => {
               )}
             </CardContent>
           </Card>
+          </Link>
         </div>
       </div>
     </div>
